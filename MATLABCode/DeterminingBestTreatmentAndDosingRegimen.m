@@ -261,12 +261,12 @@ best_trt = strings(size(data,1),1);
    % Filter for schedules that satisfy beta_total <= b_max := 0.08
    temp = temp(temp.beta_total <= 0.08,:);
   
-   % Table of best schedules for each tumour
+   % Table of best schedules for each tumour in the cohort
    best_schedules = [];
    for i = 1:250
       
       % subset of the data for tumour i
-      temp_i = a(double(a.ID) == i,:);
+      temp_i = temp(double(temp.ID) == i,:);
       % create a vector of Delta_viable + Delta_total for every schedule
       temp_i.Sum_Deltas = temp_i.Delta_total + temp_i.Delta_viable;
       % sort the data in ascending order of Delta_viable + Delta_total
@@ -285,16 +285,16 @@ best_trt = strings(size(data,1),1);
            
            % list of HT schedules that are more effective than the best
            % RT+HT schedule according to the rules set out in the paper           
-           ht_rt_best = a_temp((a_temp.trt == "HT" |  a_temp.trt == "RT") & ...
-                              (a_temp.Delta_total - total_best < 10 | ...
-                              a_temp.Delta_viable - viable_best < 10)  ,:);
+           ht_rt_best = temp_i((temp_i.trt == "HT" |  temp_i.trt == "RT") & ...
+                              (temp_i.Delta_total - total_best < 10 | ...
+                              temp_i.Delta_viable - viable_best < 10),:);
           % If there is a more effective RT or HT treatment schedule, then 
           % it is best. Otherwise, RT+HT remains best.    
           if isempty(ht_rt_best)==0       
               ht_rt_best = sortrows(ht_rt_best,"Sum_Deltas","ascend");
               best_schedules = vertcat(best_schedules,ht_rt_best(1,:));          
           else 
-              best_schedules = vertcat(best_schedules,a_temp(1,:));
+              best_schedules = vertcat(best_schedules,temp_i(1,:));
           end 
           
       end
